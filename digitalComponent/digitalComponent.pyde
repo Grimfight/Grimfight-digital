@@ -61,12 +61,14 @@ currentPlayerName = ''
 amountOfPlayers = 2
 playerBoxes = []
 buttons = {}
-dice = str(int(random(1, 7) // 1))
+dice = ''
 
 def setup():
     size(1280, 720)
     
     createButton('start', Screen.SETUP, 800, 75, 300, 100, setupIngame)
+    
+    rollDice()
     setupSetup()
 #End of setup()
 
