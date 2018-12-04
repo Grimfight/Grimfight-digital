@@ -8,5 +8,5 @@ class PlayerBox(object):
          self.food = 5
          self.water = 5
          
-def inGame():
+# def inGame():
     
