@@ -9,7 +9,7 @@ def setup():
     size(1000, 800)
     
     def testClick(): print('test')
-    createButton('test', Screen.INGAME, 0,0, 20, 20, testClick)
+    createButton('test', Screen.INGAME, 0,0, 50, 50, testClick)
     print(buttons['test']['x'] + buttons['test']['width'])
     
 def drawSetup():
@@ -25,7 +25,7 @@ def drawIngame():
     fill(100)
     for key in buttons:
         button = buttons[key]
-        rect(button['x'], button['y'], button['x'] + button['width'], button['y'] + button['height'])
+        rect(button['x'], button['y'], button['x'] + button['width'], button['y'] + button['height'], 7)
         
     text('Amount of players: ' + str(amountOfPlayers), 100, 100)
         
@@ -77,7 +77,8 @@ def mouseClicked(event):
     if event.getButton() == 37: # check for left mouse
         for key in buttons:
             button = buttons[key]
-            if event.getX() >= button['x'] and event.getX <= (button['x'] + button['width']) and event.getY >= button['y'] and event.getY <= (button['y'] + button['height']):
+            if event.getX() >= button['x'] and event.getX() <= (button['x'] + button['width']) and event.getY() >= button['y'] and event.getY() <= (button['y'] + button['height']):
+                print('runs button', key)
                 button['onClick']()
     
 
