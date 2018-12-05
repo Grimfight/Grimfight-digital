@@ -45,6 +45,36 @@ def nextPlayer():
     currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber + 1)
 #End of nextPlayer()
 
+def addHealth():
+    if(playerBoxes[currentPlayer].health < 20):
+        playerBoxes[currentPlayer].health += 1
+#End of addHealth()
+
+def removeHealth():
+    if(playerBoxes[currentPlayer].health > 0):
+        playerBoxes[currentPlayer].health -= 1
+#End of removeHealth()
+
+def addFood():
+    if(playerBoxes[currentPlayer].food < 9):
+        playerBoxes[currentPlayer].food += 1
+#End of addFood()
+
+def removeFood():
+    if(playerBoxes[currentPlayer].food > 0):
+        playerBoxes[currentPlayer].food -= 1
+#End of removeFood()
+
+def addWater():
+    if(playerBoxes[currentPlayer].water < 9):
+        playerBoxes[currentPlayer].water += 1
+#End of addWater()
+
+def removeWater():
+    if(playerBoxes[currentPlayer].water > 0):
+        playerBoxes[currentPlayer].water -= 1
+#End of removeWater()
+
 def rollDice():
     global dice
     
@@ -97,6 +127,15 @@ def setupIngame():
     currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber + 1)
     createButton('nextPlayer', Screen.INGAME, 410, 365, 200, 50, nextPlayer)
     createButton('dice', Screen.INGAME, 700, 365, 200, 50, rollDice)
+    
+    createButton('addHealth', Screen.INGAME, 200, 420, 75, 50, addHealth)
+    createButton('removeHealth', Screen.INGAME, 300, 420, 75, 50, removeHealth)
+    
+    createButton('addFood', Screen.INGAME, 200, 480, 75, 50, addFood)
+    createButton('removeFood', Screen.INGAME, 300, 480, 75, 50, removeFood)
+    
+    createButton('addWater', Screen.INGAME, 200, 540, 75, 50, addWater)
+    createButton('removeWater', Screen.INGAME, 300, 540, 75, 50, removeWater)
 
     currentScreen = Screen.INGAME
 #End of setupIngame()
@@ -142,12 +181,17 @@ def drawIngame():
     text("Current Player: " + currentPlayerName, 50, 400)
     text("Dice Roll: " + dice, 700, 450)
     text("Round: " + str(currentRound), 1000, 50)
+    text("Health", 100, 450)
+    text("Food", 100, 510)
+    text("Water", 100, 570)
     
     # Button text
     
     textSize(20)
     text("Next Player", 455, 398)
     text("Roll Dice", 760, 398)
+    
+    
     
 #End of drawIngame()
 
