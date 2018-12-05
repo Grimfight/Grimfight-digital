@@ -190,12 +190,12 @@ def drawIngame():
     textSize(20)
     text("Next Player", 455, 398)
     text("Roll Dice", 760, 398)
-    text("+", 220, 450)
-    text("-", 250, 450)
-    text("+", 220, 510)
-    text("-", 250, 510)
-    text("+", 220, 570)
-    text("-", 250, 570)
+    text("+", 230, 450)
+    text("-", 330, 450)
+    text("+", 230, 510)
+    text("-", 330, 510)
+    text("+", 230, 570)
+    text("-", 330, 570)
     
     
 #End of drawIngame()
