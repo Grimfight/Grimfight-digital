@@ -142,15 +142,14 @@ def setupIngame():
     
 def drawSetup():
     # text for how many players
-    fill(20)
     text('How many players do you want?', 100, 100)
     
     # rectangle behind input
-    fill(225)
+    fill(0, 21, 35)
     rect(100 , 130, 100, 40)
         
     # the input text
-    fill(0)
+    fill(255)
     text(amountOfPlayers, 110, 160)
     
     #start button text
@@ -161,7 +160,6 @@ def drawIngame():
     global playerBoxes
     
     # Player amount
-    
     text('Amount of players: ' + str(amountOfPlayers), 50, 50)
         
     x = 50
@@ -175,8 +173,7 @@ def drawIngame():
         text(s, x, 90)
         x = x + 175
     
-    # Info text
-        
+    # Info text    
     textSize(30)
     text("Current Player: " + currentPlayerName, 50, 400)
     text("Dice Roll: " + dice, 700, 450)
@@ -186,7 +183,6 @@ def drawIngame():
     text("Water", 100, 570)
     
     # Button text
-    
     textSize(20)
     text("Next Player", 455, 398)
     text("Roll Dice", 760, 398)
@@ -196,13 +192,28 @@ def drawIngame():
     text("-", 330, 510)
     text("+", 230, 570)
     text("-", 330, 570)
-    
-    
 #End of drawIngame()
 
+def drawSections():
+    noStroke()
+    fill(0, 22, 38)
+    if(currentScreen == Screen.SETUP):
+        # Player selection
+        rect(60, 60, 600, 160)
+    elif(currentScreen == Screen.INGAME):
+        # Player boxes
+        rect(20, 10, 700, 210)
+        # Player stat add/remove
+        rect(20, 340, 630, 280)
+        # Dice
+        rect(660, 340, 280, 140)
+        # Round counter
+        rect(980, 10, 220, 80)
+#End of drawSections()
+
 def drawButtons():
-    stroke(127)
-    fill(200)
+    stroke(31,89,127)
+    fill(0, 30, 50)
     for key in buttons:
         button = buttons[key]
         if(button['screen'] == currentScreen):
@@ -210,14 +221,16 @@ def drawButtons():
 #End of drawButtons()
 
 def draw():
-    background(255)
+    background(0, 15, 25)
+    
+    # Sections
+    drawSections()
     
     # Draws the buttons depending on currentScreen
     drawButtons()
     
     textSize(30)
-    fill(0)
-    stroke(0)
+    fill(255)
     
     if currentScreen == Screen.SETUP:
        drawSetup()
