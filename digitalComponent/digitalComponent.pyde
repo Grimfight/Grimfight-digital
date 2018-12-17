@@ -1,3 +1,5 @@
+from javax.swing.JOptionPane import showMessageDialog;
+
 # Enums not possible??
 class Screen():
     SETUP = 1
@@ -13,6 +15,7 @@ class PlayerBox(object):
         self.health = 20
         self.food = 5
         self.water = 5
+        self.isDead = False
 #End of PlayerBox()
          
 # name = the button name
@@ -35,6 +38,12 @@ def nextPlayer():
     global currentPlayerName
     global playerBoxes
     global amountOfPlayers
+    global deathAmount
+    
+    previousPlayer = currentPlayer
+    previousPlayerName = currentPlayerName
+    
+    
     
     if currentPlayer < (amountOfPlayers - 1):
         currentPlayer += 1
@@ -42,7 +51,21 @@ def nextPlayer():
     else:
         currentPlayer = 0
         currentRound += 1
+        
     currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber + 1)
+    
+    if playerBoxes[previousPlayer].health < 1 and not playerBoxes[previousPlayer].isDead:
+        deathAmount += 1
+        if deathAmount >= amountOfPlayers - 1:
+            showMessageDialog(None, currentPlayerName + ": You win!")
+            setupSetup()
+            return
+        else:
+            showMessageDialog(None, previousPlayerName + " died")
+            playerBoxes[previousPlayer].isDead = True
+            playerBoxes[previousPlayer].water = playerBoxes[previousPlayer].food = 0
+    if playerBoxes[currentPlayer].isDead:
+        nextPlayer()
 #End of nextPlayer()
 
 def addHealth():
@@ -92,6 +115,7 @@ amountOfPlayers = 2
 playerBoxes = []
 buttons = {}
 dice = ''
+deathAmount = 0
 
 def setup():
     size(1280, 720)
