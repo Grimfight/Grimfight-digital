@@ -1,3 +1,4 @@
+#Import showMessageDialog method from JoptionPane Java class
 from javax.swing.JOptionPane import showMessageDialog;
 
 # Enums not possible??
@@ -101,8 +102,7 @@ def removeWater():
 def rollDice():
     global dice
     
-    dice = str(int(random(1, 7) // 1))
-    print(dice)
+    dice = int(random(1, 7) // 1)
 #End of rollDice()
 
 # Global vars
@@ -114,7 +114,7 @@ currentPlayerName = ''
 amountOfPlayers = 2
 playerBoxes = []
 buttons = {}
-dice = ''
+dice = 0
 deathAmount = 0
 
 def setup():
@@ -196,11 +196,33 @@ def drawIngame():
         textSize(22)
         text(s, x, 90)
         x = x + 175
+        
+    # Dice
+    diceX = 900
+    diceY = 475
+    diceR = 20
+    stroke(0)
+    rect(diceX - 50, diceY - 50, 100, 100)
+    fill(0)
+    if dice==1:
+        ellipse(diceX, diceY, diceR, diceR)
+    elif dice==2:
+        ellipse(diceX-30, diceY+30, diceR, diceR), ellipse(diceX+30, diceY-30, diceR, diceR)
+    elif dice==3:
+        ellipse(diceX, diceY, diceR, diceR), ellipse(diceX-30, diceY+30, diceR, diceR), ellipse(diceX+30, diceY-30, diceR, diceR) 
+    elif dice==4:
+        ellipse(diceX+30, diceY+30, diceR, diceR), ellipse(diceX+30, diceY-30, diceR, diceR), ellipse(diceX-30, diceY+30, diceR, diceR), ellipse(diceX-30, diceY-30, diceR, diceR)
+    elif dice==5:
+        ellipse(diceX+30, diceY+30, diceR, diceR), ellipse(diceX+30, diceY-30, diceR, diceR), ellipse(diceX-30, diceY+30, diceR, diceR), ellipse(diceX-30, diceY-30, diceR, diceR), ellipse(diceX, diceY, diceR, diceR)
+    else:
+        ellipse(diceX+30, diceY+30, diceR, diceR), ellipse(diceX+30, diceY-30, diceR, diceR), ellipse(diceX-30, diceY+30, diceR, diceR), ellipse(diceX-30, diceY-30, diceR, diceR), ellipse(diceX-30, diceY, diceR, diceR), ellipse(diceX+30, diceY, diceR, diceR)
     
+    fill(255)
+        
     # Info text    
     textSize(30)
     text("Current Player: " + currentPlayerName, 50, 400)
-    text("Dice Roll: " + dice, 700, 450)
+    text("Dice Roll:", 700, 450)
     text("Round: " + str(currentRound), 1000, 50)
     text("Health", 100, 450)
     text("Food", 100, 510)
@@ -230,7 +252,7 @@ def drawSections():
         # Player stat add/remove
         rect(20, 340, 630, 280)
         # Dice
-        rect(660, 340, 280, 140)
+        rect(660, 340, 320, 210)
         # Round counter
         rect(980, 10, 220, 80)
 #End of drawSections()
