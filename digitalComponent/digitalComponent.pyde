@@ -273,7 +273,7 @@ def drawIngame():
     
     if isUndoable:
         textSize(18)
-        text("Undo turn", 665, 397)
+        text("Undo Turn", 665, 397)
         textSize(20)
 #End of drawIngame()
 
