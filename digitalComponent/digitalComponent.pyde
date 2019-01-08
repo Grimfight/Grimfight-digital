@@ -29,7 +29,7 @@ class PlayerBox(object):
 def createButton(name, screen, x, y, width, height, onClick):
     global buttons
     
-    buttons[name] = {'screen': screen, 'x': x, 'y': y, 'width': width, 'height': height, 'onClick': onClick}
+    buttons[name] = {'name': name, 'screen': screen, 'x': x, 'y': y, 'width': width, 'height': height, 'onClick': onClick}
     return buttons[name]
 #End of createButton()
 
@@ -40,11 +40,13 @@ def nextPlayer():
     global playerBoxes
     global amountOfPlayers
     global deathAmount
+    global undoPlayerBoxes
+    global undoPlayer
+    global isUndoable
     
     previousPlayer = currentPlayer
     previousPlayerName = currentPlayerName
-    
-    
+    isUndoable = True
     
     if currentPlayer < (amountOfPlayers - 1):
         currentPlayer += 1
@@ -65,9 +67,31 @@ def nextPlayer():
             showMessageDialog(None, previousPlayerName + " died")
             playerBoxes[previousPlayer].isDead = True
             playerBoxes[previousPlayer].water = playerBoxes[previousPlayer].food = 0
+
     if playerBoxes[currentPlayer].isDead:
         nextPlayer()
+    else:
+        undoPlayer = previousPlayer
+        undoPlayerBoxes = playerBoxes
 #End of nextPlayer()
+
+def undoTurn():
+    global currentPlayer
+    global currentRound
+    global currentPlayerName
+    global playerBoxes
+    global undoPlayerBoxes
+    global undoPlayer
+    global isUndoable
+    
+    isUndoable = False
+    playerBoxes = undoPlayerBoxes
+    currentPlayer = undoPlayer
+    currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber + 1)
+    
+    if currentPlayer == amountOfPlayers - 1:
+        currentRound -= 1
+#End of undoTurn()
 
 def addHealth():
     if(playerBoxes[currentPlayer].health < 20):
@@ -113,14 +137,15 @@ currentPlayer = 0
 currentPlayerName = ''
 amountOfPlayers = 2
 playerBoxes = []
+undoPlayerBoxes = []
+undoPlayer = 0
 buttons = {}
 dice = 0
 deathAmount = 0
+isUndoable = False
 
 def setup():
     size(1280, 720)
-    
-    createButton('start', Screen.SETUP, 800, 75, 300, 100, setupIngame)
     
     rollDice()
     setupSetup()
@@ -131,6 +156,10 @@ def setupSetup():
     global currentScreen
     
     playerBoxes = []
+    undoPlayerBoxes = []
+    isUndoable = False
+    
+    createButton('start', Screen.SETUP, 800, 75, 300, 100, setupIngame)
 
     currentScreen = Screen.SETUP
 #End of setupSetup()
@@ -144,13 +173,14 @@ def setupIngame():
     
     currentRound = 1
     currentPlayer = 0
+    undoPlayer = 0
     
     for x in range(int(amountOfPlayers)):
         playerBoxes.append(PlayerBox(x))
         
     currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber + 1)
     createButton('nextPlayer', Screen.INGAME, 410, 365, 200, 50, nextPlayer)
-    createButton('dice', Screen.INGAME, 700, 365, 200, 50, rollDice)
+    createButton('dice', Screen.INGAME, 1000, 365, 200, 50, rollDice)
     
     createButton('addHealth', Screen.INGAME, 200, 420, 75, 50, addHealth)
     createButton('removeHealth', Screen.INGAME, 300, 420, 75, 50, removeHealth)
@@ -160,6 +190,8 @@ def setupIngame():
     
     createButton('addWater', Screen.INGAME, 200, 540, 75, 50, addWater)
     createButton('removeWater', Screen.INGAME, 300, 540, 75, 50, removeWater)
+    
+    createButton('undo', Screen.INGAME, 640, 365, 140, 50, undoTurn)
 
     currentScreen = Screen.INGAME
 #End of setupIngame()
@@ -198,7 +230,7 @@ def drawIngame():
         x = x + 175
         
     # Dice
-    diceX = 900
+    diceX = 1180
     diceY = 475
     diceR = 20
     stroke(0)
@@ -222,7 +254,7 @@ def drawIngame():
     # Info text    
     textSize(30)
     text("Current Player: " + currentPlayerName, 50, 400)
-    text("Dice Roll:", 700, 450)
+    text("Dice Roll:", 960, 450)
     text("Round: " + str(currentRound), 1000, 50)
     text("Health", 100, 450)
     text("Food", 100, 510)
@@ -231,13 +263,18 @@ def drawIngame():
     # Button text
     textSize(20)
     text("Next Player", 455, 398)
-    text("Roll Dice", 760, 398)
+    text("Roll Dice", 1060, 398)
     text("+", 230, 450)
     text("-", 330, 450)
     text("+", 230, 510)
     text("-", 330, 510)
     text("+", 230, 570)
     text("-", 330, 570)
+    
+    if isUndoable:
+        textSize(18)
+        text("Undo turn", 665, 397)
+        textSize(20)
 #End of drawIngame()
 
 def drawSections():
@@ -250,9 +287,9 @@ def drawSections():
         # Player boxes
         rect(20, 10, 700, 210)
         # Player stat add/remove
-        rect(20, 340, 630, 280)
+        rect(20, 340, 800, 280)
         # Dice
-        rect(660, 340, 320, 210)
+        rect(940, 340, 320, 210)
         # Round counter
         rect(980, 10, 220, 80)
 #End of drawSections()
@@ -262,8 +299,14 @@ def drawButtons():
     fill(0, 30, 50)
     for key in buttons:
         button = buttons[key]
-        if(button['screen'] == currentScreen):
-            rect(button['x'], button['y'], button['width'], button['height'], 7)
+        if button['screen'] == currentScreen:
+            
+            #Code could be better, but is more understandable
+            if button['name'] == "undo":
+                    if isUndoable:
+                        rect(button['x'], button['y'], button['width'], button['height'], 7)
+            else:
+                rect(button['x'], button['y'], button['width'], button['height'], 7)
 #End of drawButtons()
 
 def draw():
@@ -307,5 +350,10 @@ def mouseClicked(event):
                 event.getX() >= button['x'] and event.getX() <= (button['x'] + button['width']) and \
                 event.getY() >= button['y'] and event.getY() <= (button['y'] + button['height']):
                 
-                button['onClick']()
+                #Code could be better, but is more understandable
+                if button['name'] == "undo":
+                    if isUndoable:
+                        button['onClick']()
+                else:
+                    button['onClick']()
 #End of mouseClicked()
