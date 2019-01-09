@@ -17,6 +17,9 @@ class PlayerBox(object):
         self.food = 5
         self.water = 5
         self.isDead = False
+        
+    def getStats(self):
+        return {"health": self.health, "food": self.food, "water": self.water, "isDead": self.isDead  }
 #End of PlayerBox()
          
 # name = the button name
@@ -40,13 +43,16 @@ def nextPlayer():
     global playerBoxes
     global amountOfPlayers
     global deathAmount
-    global undoPlayerBoxes
     global undoPlayer
+    global undoPlayerStats
     global isUndoable
+    global prevPlayerDied
+    global previousPlayer
     
     previousPlayer = currentPlayer
     previousPlayerName = currentPlayerName
     isUndoable = True
+    prevPlayerDied = False
     
     if currentPlayer < (amountOfPlayers - 1):
         currentPlayer += 1
@@ -55,24 +61,36 @@ def nextPlayer():
         currentPlayer = 0
         currentRound += 1
         
-    currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber + 1)
+    currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber)
     
     if playerBoxes[previousPlayer].health < 1 and not playerBoxes[previousPlayer].isDead:
         deathAmount += 1
+        prevPlayerDied = True
+        playerBoxes[previousPlayer].isDead = True
+        
+        # update undoPlayer & undoPlayerStats if turn needs to be undone
+        undoPlayer = previousPlayer
+        undoPlayerStats = playerBoxes[currentPlayer].getStats()
+        
         if deathAmount >= amountOfPlayers - 1:
-            showMessageDialog(None, currentPlayerName + ": You win!")
+            winner = ""
+            for player in playerBoxes:
+                if player.isDead == False:
+                    winner = "Player " + str(player.playerNumber)
+                    break
+            
+            showMessageDialog(None, winner + ": You win!")
             setupSetup()
             return
         else:
             showMessageDialog(None, previousPlayerName + " died")
-            playerBoxes[previousPlayer].isDead = True
             playerBoxes[previousPlayer].water = playerBoxes[previousPlayer].food = 0
 
     if playerBoxes[currentPlayer].isDead:
         nextPlayer()
-    else:
+    if not playerBoxes[previousPlayer].isDead:
         undoPlayer = previousPlayer
-        undoPlayerBoxes = playerBoxes
+        undoPlayerStats = playerBoxes[currentPlayer].getStats()
 #End of nextPlayer()
 
 def undoTurn():
@@ -80,17 +98,28 @@ def undoTurn():
     global currentRound
     global currentPlayerName
     global playerBoxes
-    global undoPlayerBoxes
     global undoPlayer
     global isUndoable
+    global previousPlayer
+    global prevPlayerDied
+    global deathAmount
+    
+    player = playerBoxes[currentPlayer]
+    player.health = undoPlayerStats["health"]
+    player.food = undoPlayerStats["food"]
+    player.water = undoPlayerStats["water"]
+    player.isDead = undoPlayerStats["isDead"]
     
     isUndoable = False
-    playerBoxes = undoPlayerBoxes
     currentPlayer = undoPlayer
-    currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber + 1)
+    currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber)
     
     if currentPlayer == amountOfPlayers - 1:
         currentRound -= 1
+        
+    if prevPlayerDied:
+        playerBoxes[currentPlayer].isDead = False
+        deathAmount -= 1
 #End of undoTurn()
 
 def addHealth():
@@ -137,8 +166,10 @@ currentPlayer = 0
 currentPlayerName = ''
 amountOfPlayers = 2
 playerBoxes = []
-undoPlayerBoxes = []
+previousPlayer = 0
 undoPlayer = 0
+undoPLayerStats = {}
+prevPlayerDied = False
 buttons = {}
 dice = 0
 deathAmount = 0
@@ -156,7 +187,6 @@ def setupSetup():
     global currentScreen
     
     playerBoxes = []
-    undoPlayerBoxes = []
     isUndoable = False
     
     createButton('start', Screen.SETUP, 800, 75, 300, 100, setupIngame)
@@ -170,15 +200,22 @@ def setupIngame():
     global currentRound
     global currentPlayer
     global currentPlayerName
+    global deathAmount
+    global undoPlayer
+    global undoPlayerStats
+    global previousPlayer
     
     currentRound = 1
     currentPlayer = 0
+    previousPlayer = 0
+    deathAmount = 0
     undoPlayer = 0
+    undoPlayerStats = {}
     
     for x in range(int(amountOfPlayers)):
-        playerBoxes.append(PlayerBox(x))
+        playerBoxes.append(PlayerBox(x+1))
         
-    currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber + 1)
+    currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber)
     createButton('nextPlayer', Screen.INGAME, 410, 365, 200, 50, nextPlayer)
     createButton('dice', Screen.INGAME, 1000, 365, 200, 50, rollDice)
     
@@ -220,7 +257,7 @@ def drawIngame():
         
     x = 50
     for playerBox in playerBoxes:
-        s = 'Player ' + str(playerBox.playerNumber + 1) + '\n'
+        s = 'Player ' + str(playerBox.playerNumber) + '\n'
         s = s + 'health: ' + str(playerBox.health) + '\n'
         s = s + 'food: ' + str(playerBox.food) + '\n'
         s = s + 'water: ' + str(playerBox.water) + '\n'
