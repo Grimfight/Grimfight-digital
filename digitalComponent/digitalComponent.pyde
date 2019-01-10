@@ -8,7 +8,6 @@ class Screen():
 #End of Screen()
 
 class PlayerBox():
-    
     def __init__(self, playerNumber):
         self.x = 50 + 200 * playerNumber
         self.y = 200
@@ -49,10 +48,12 @@ def nextPlayer():
     global prevPlayerDied
     global previousPlayer
     
-    previousPlayer = currentPlayer
-    previousPlayerName = currentPlayerName
     isUndoable = True
-    prevPlayerDied = False
+    
+    if not playerBoxes[currentPlayer].isDead:
+        previousPlayer = currentPlayer
+        previousPlayerName = currentPlayerName
+        prevPlayerDied = False
     
     if currentPlayer < (amountOfPlayers - 1):
         currentPlayer += 1
@@ -62,6 +63,10 @@ def nextPlayer():
         currentRound += 1
         
     currentPlayerName = "Player " + str(playerBoxes[currentPlayer].playerNumber)
+    
+    if playerBoxes[currentPlayer].isDead:
+        nextPlayer()
+        return
     
     if playerBoxes[previousPlayer].health < 1 and not playerBoxes[previousPlayer].isDead:
         deathAmount += 1
@@ -86,15 +91,9 @@ def nextPlayer():
             showMessageDialog(None, previousPlayerName + " died")
             playerBoxes[previousPlayer].water = playerBoxes[previousPlayer].food = 0
 
-    if playerBoxes[currentPlayer].isDead:
-        print("is dead")
-        nextPlayer()
     if not playerBoxes[previousPlayer].isDead:
-        print("true")
         undoPlayer = previousPlayer
         undoPlayerStats = playerBoxes[currentPlayer].getStats()
-    
-    print('next', currentPlayer, previousPlayer, undoPlayer)
 #End of nextPlayer()
 
 def undoTurn():
@@ -107,8 +106,7 @@ def undoTurn():
     global previousPlayer
     global prevPlayerDied
     global deathAmount
-    
-    print('undo', undoPlayer)
+
     player = playerBoxes[currentPlayer]
     player.health = undoPlayerStats["health"]
     player.food = undoPlayerStats["food"]
