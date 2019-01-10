@@ -87,10 +87,14 @@ def nextPlayer():
             playerBoxes[previousPlayer].water = playerBoxes[previousPlayer].food = 0
 
     if playerBoxes[currentPlayer].isDead:
+        print("is dead")
         nextPlayer()
     if not playerBoxes[previousPlayer].isDead:
+        print("true")
         undoPlayer = previousPlayer
         undoPlayerStats = playerBoxes[currentPlayer].getStats()
+    
+    print('next', currentPlayer, previousPlayer, undoPlayer)
 #End of nextPlayer()
 
 def undoTurn():
@@ -104,6 +108,7 @@ def undoTurn():
     global prevPlayerDied
     global deathAmount
     
+    print('undo', undoPlayer)
     player = playerBoxes[currentPlayer]
     player.health = undoPlayerStats["health"]
     player.food = undoPlayerStats["food"]
@@ -188,8 +193,10 @@ def setupSetup():
     
     playerBoxes = []
     isUndoable = False
-    
-    createButton('start', Screen.SETUP, 800, 75, 300, 100, setupIngame)
+        
+    createButton('twoplayers', Screen.SETUP, 100, 400, 300, 200, twoplayers)
+    createButton('threeplayers', Screen.SETUP, 500, 400, 300, 200, threeplayers)
+    createButton('fourplayers', Screen.SETUP, 900, 400, 300, 200, fourplayers)
 
     currentScreen = Screen.SETUP
 #End of setupSetup()
@@ -232,21 +239,41 @@ def setupIngame():
 
     currentScreen = Screen.INGAME
 #End of setupIngame()
+
+def twoplayers():
+    global amountOfPlayers
+    amountOfPlayers = 2
+    setupIngame()
+
+def threeplayers():
+    global amountOfPlayers
+    amountOfPlayers = 3
+    setupIngame()
+
+def fourplayers():
+    global amountOfPlayers
+    amountOfPlayers = 4
+    setupIngame()
+
     
 def drawSetup():
+    ''' INPUT / START BUTTON '''    
     # text for how many players
-    text('How many players do you want?', 100, 100)
-    
-    # rectangle behind input
-    fill(0, 21, 35)
-    rect(100 , 130, 100, 40)
-        
-    # the input text
     fill(255)
-    text(amountOfPlayers, 110, 160)
+    text('With how many players do you want to play?', 275, 150)
+
+
     
-    #start button text
-    text("Start game", 870, 135)
+    ''' AMOUNT OF PLAYERS PER BUTTON '''
+    # text for the buttons from left to right
+    fill(255)
+    x = 200
+    text('Two\nPlayers'  , 200 , 450, 300, 200)
+    text('Three\nPlayers', 600 , 450, 300, 200)
+    text('Four\nPlayers' , 1000, 450, 300, 200)
+    
+    
+
 #End of drawSetup()
     
 def drawIngame():
@@ -319,8 +346,8 @@ def drawSections():
     fill(0, 22, 38)
     if(currentScreen == Screen.SETUP):
         # Player selection
-        rect(60, 60, 600, 160)
-    elif(currentScreen == Screen.INGAME):
+        rect(200, 60, width - 400, 160)
+    if(currentScreen == Screen.INGAME):
         # Player boxes
         rect(20, 10, 700, 210)
         # Player stat add/remove
@@ -369,12 +396,7 @@ def keyPressed():
     global currentScreen
     global amountOfPlayers
     
-    if currentScreen == Screen.SETUP:
-        if key == '2' or key == '3' or key == '4':
-            amountOfPlayers = int(key)
-        elif key == '\n':
-            setupIngame()
-    elif currentScreen == Screen.INGAME:
+    if currentScreen == Screen.INGAME:
         if keyCode == 8: #backspace to go back
             setupSetup()
 #End of keyPressed()
