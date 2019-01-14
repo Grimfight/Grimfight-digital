@@ -179,6 +179,8 @@ deathAmount = 0
 isUndoable = False
 
 def setup():
+    global BG
+    BG = loadImage("BG.png")
     size(1280, 720)
     
     rollDice()
@@ -341,7 +343,7 @@ def drawIngame():
 
 def drawSections():
     noStroke()
-    fill(0, 22, 38)
+    fill(0, 22, 38, 200)
     if(currentScreen == Screen.SETUP):
         # Player selection
         rect(200, 60, width - 400, 160)
@@ -372,7 +374,9 @@ def drawButtons():
 #End of drawButtons()
 
 def draw():
-    background(0, 15, 25)
+    # new background
+    image(BG, 0, 0)
+    # background(0, 15, 25) <= Original background
     
     # Sections
     drawSections()
